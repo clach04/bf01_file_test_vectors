@@ -1,4 +1,4 @@
-# Test Vectors Harness
+# BF01 Tombo CHI/CHS Test Vectors Harness
 
 Python test harness for testing decryption CLI tools using JSON test vectors.
 
@@ -18,6 +18,9 @@ The optional `cmd_template` argument specifies the CLI command with placeholders
 - `{PASSPHRASE}` - Passphrase for decryption
 
 Example:
+
+Using binary built from https://github.com/clach04/tombo/blob/my_changes/contrib/TomboCrypt/chi_crypt.c
+
 ```bash
 python testharness.py chi_crypt testvectors/ "{CLI} -d --password {PASSPHRASE} {IN} {OUT}"
 ```
