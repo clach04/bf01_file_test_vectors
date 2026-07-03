@@ -23,6 +23,13 @@ Using binary built from https://github.com/clach04/tombo/blob/my_changes/contrib
 
 ```bash
 python testharness.py chi_crypt testvectors/ "{CLI} -d --password {PASSPHRASE} {IN} {OUT}"
+py -3  testharness.py chi_crypt testvectors/ "{CLI} -d --password {PASSPHRASE} {IN} {OUT}"
+```
+
+Using binary built from https://github.com/clach04/puren_tonbo/blob/main/puren_tonbo/tools/ptcipher.py
+
+```bash
+py -3  testharness.py ptcipher  testvectors/ "{CLI} -d --password {PASSPHRASE} --cipher=chi -o {OUT} {IN}"
 ```
 
 If not provided, defaults to: `{CLI} -d -o {OUT} -p {PASSPHRASE} {IN}`
