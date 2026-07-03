@@ -1,0 +1,5 @@
+# Force binary mode for encrypted AND unencrypted files
+*.chi binary
+*.chs binary
+*.plaintext binary
+# plaintext files may be Windows text files, where newlines need to be preserved for binary compare
