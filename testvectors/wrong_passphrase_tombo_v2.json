@@ -1,0 +1,7 @@
+{
+    "comment": "Test with wrong passphrase - should fail to unwrap",
+    "passphrase": "wrong_password",
+    "expect": "no match",
+    "payload_file": "tombo_test_v2.chi",
+    "expected_canon": "tombo_test.plaintext"
+}
