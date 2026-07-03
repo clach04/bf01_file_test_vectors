@@ -1,0 +1,7 @@
+{
+    "comment": "Test with wrong passphrase - should fail to unwrap",
+    "passphrase": "wrong_password",
+    "expect": "no match",
+    "payload_file": "example_payload.bin",
+    "expected_canon": "example_canon.bin"
+}

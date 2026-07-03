@@ -1,0 +1,7 @@
+{
+    "comment": "Basic successful decryption test",
+    "passphrase": "test_password_123",
+    "expect": "success",
+    "payload_file": "example_payload.bin",
+    "expected_canon": "example_canon.bin"
+}
