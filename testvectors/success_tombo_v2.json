@@ -1,0 +1,7 @@
+{
+    "comment": "Basic successful decryption test, Tombo v2 win32 created file",
+    "passphrase": "password",
+    "expect": "success",
+    "payload_file": "tombo_test_v2.chi",
+    "expected_canon": "tombo_test.plaintext"
+}
