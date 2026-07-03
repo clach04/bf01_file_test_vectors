@@ -8,6 +8,10 @@
 
 ## Future Considerations
 
+### Support tools that output to stdout
+
+Remove the need for temporary files, reduce file IO.
+
 ### Hex Payload in JSON
 
 Allow embedding hex-encoded payloads directly in JSON files alongside external file references.
