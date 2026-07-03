@@ -6,7 +6,7 @@ import unittest
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from testharness import load_test_vector, compute_hash
+from testharness import load_test_vector, compute_hash, run_decrypt
 
 class TestLoadTestVector(unittest.TestCase):
     def test_load_json(self):
@@ -24,6 +24,12 @@ class TestComputeHash(unittest.TestCase):
         h = compute_hash(test_file)
         self.assertEqual(len(h), 64)
         os.remove(test_file)
+
+class TestCmdTemplate(unittest.TestCase):
+    def test_custom_template(self):
+        template = ['{CLI}', '-d', '--password', '{PASSPHRASE}', '{IN}', '{OUT}']
+        result = run_decrypt('cli', 'in.bin', 'pass', 'out.bin', template)
+        self.assertEqual(result, -1)
 
 if __name__ == '__main__':
     unittest.main()

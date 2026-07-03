@@ -24,15 +24,21 @@ def compute_hash(file_path):
             sha256.update(chunk)
     return sha256.hexdigest()
 
-def run_decrypt(cli_path, payload_path, passphrase, output_path):
-    cmd = [cli_path, '-d', '-o', output_path, '-p', passphrase, payload_path]
+def run_decrypt(cli_path, payload_path, passphrase, output_path, cmd_template):
+    cmd = []
+    for arg in cmd_template:
+        arg = arg.replace('{CLI}', cli_path)
+        arg = arg.replace('{IN}', payload_path)
+        arg = arg.replace('{OUT}', output_path)
+        arg = arg.replace('{PASSPHRASE}', passphrase)
+        cmd.append(arg)
     try:
         result = subprocess.call(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         return result
     except Exception as e:
         return -1
 
-def verify_test(test_vector, payload_dir, cli_path):
+def verify_test(test_vector, payload_dir, cli_path, cmd_template):
     comment = test_vector.get('comment', '')
     expect = test_vector['expect']
     passphrase = test_vector.get('passphrase', '')
@@ -42,7 +48,7 @@ def verify_test(test_vector, payload_dir, cli_path):
     output_path = payload_path + '.dec'
     if not os.path.exists(payload_path):
         return False, comment + ' [missing payload]'
-    result = run_decrypt(cli_path, payload_path, passphrase, output_path)
+    result = run_decrypt(cli_path, payload_path, passphrase, output_path, cmd_template)
     passed = False
     if expect == 'success':
         if result == 0:
@@ -70,10 +76,15 @@ def verify_test(test_vector, payload_dir, cli_path):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python testharness.py <cli_path> <test_vectors_dir>")
+        print("Usage: python testharness.py <cli_path> <test_vectors_dir> [cmd_template]")
+        print("  cmd_template: e.g. '{CLI} -d --password {PASSPHRASE} {IN} {OUT}'")
         sys.exit(1)
     cli_path = sys.argv[1]
     test_vectors_dir = sys.argv[2]
+    if len(sys.argv) >= 4:
+        cmd_template = sys.argv[3].split()
+    else:
+        cmd_template = [cli_path, '-d', '-o', '{OUT}', '-p', '{PASSPHRASE}', '{IN}']
     passed = 0
     failed = 0
     for filename in sorted(os.listdir(test_vectors_dir)):
@@ -81,7 +92,7 @@ def main():
             continue
         json_path = os.path.join(test_vectors_dir, filename)
         tv = load_test_vector(json_path)
-        result, comment = verify_test(tv, test_vectors_dir, cli_path)
+        result, comment = verify_test(tv, test_vectors_dir, cli_path, cmd_template)
         if result:
             passed += 1
             print("PASS: %s - %s" % (filename, comment))
