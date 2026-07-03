@@ -1,0 +1,7 @@
+{
+    "comment": "100K Aesop fable decrypt",
+    "passphrase": "password",
+    "expect": "success",
+    "payload_file": "pg28_the_fables_of_aesop_utf8.chi",
+    "expected_canon": "pg28_the_fables_of_aesop_utf8.plaintext"
+}

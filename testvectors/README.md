@@ -17,7 +17,7 @@ Some extracted from https://github.com/clach04/puren_tonbo/tree/main/puren_tonbo
 
   * aesop.plaintext - plain text version of shortest Aesop fable there is,
     so suitable for realistic test data.
-      * has window newlines
+      * has window (CR+LF) newlines
       * us-ascii encoding
       * Contains long lines (one is 1435 bytes)
       * Approx 1.5Kb.
@@ -44,6 +44,7 @@ Some extracted from https://github.com/clach04/puren_tonbo/tree/main/puren_tonbo
 
   * pg28_the_fables_of_aesop_utf8.chi - Tombo Blowfish encrypted from `pg28_the_fables_of_aesop_utf8.plaintext`
       * Approx 100Kb.
+      * has Unix (LF) newlines
       * utf-8 encoding
       * NOTE includes BOM at start of file
       * Created with `TomboCrypt.exe enc pg28_the_fables_of_aesop_utf8.chi password<pg28_the_fables_of_aesop_utf8.plaintext` from Tombo https://github.com/clach04/tombo
