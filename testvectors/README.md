@@ -59,3 +59,9 @@ Some extracted from https://github.com/clach04/puren_tonbo/tree/main/puren_tonbo
         * Kumagusu 1.21 - Android
           * will load, no BOM issues
           * will save cleanly
+
+  * pg28_the_fables_of_aesop_utf8_salted00.chi - Tombo Blowfish encrypted from `pg28_the_fables_of_aesop_utf8.plaintext`
+      * Similar to pg28_the_fables_of_aesop_utf8.chi, except this was encrypted using `chi_crypt_salted` using salt of all zeros, `--salt 0000000000000000`
+      * This should be decryptable by any Tombo compatible tool, BUT not all Tombo compatible tools will be able to generate this exact file, reasons for failure to match:
+          * no salt support - the obvious reason
+          * difference in behavior for how the (essentially unused) padding at the end is handled - chi_io/ptcipher do some but twiddling (also don't have salt support, but that is easier to hack in)
