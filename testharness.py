@@ -24,13 +24,15 @@ def compute_hash(file_path):
             sha256.update(chunk)
     return sha256.hexdigest()
 
-def run_decrypt(cli_path, payload_path, passphrase, output_path, cmd_template):
+def run_decrypt(cli_path, payload_path, passphrase, output_path, cmd_template, salt='', encrypt=False):
     cmd = []
     for arg in cmd_template:
         arg = arg.replace('{CLI}', cli_path)
         arg = arg.replace('{IN}', payload_path)
         arg = arg.replace('{OUT}', output_path)
         arg = arg.replace('{PASSPHRASE}', passphrase)
+        arg = arg.replace('{SALT}', salt)
+        arg = arg.replace('{ENCRYPT}', '-e' if encrypt else '-d')  # FIXME revisit this. a) name (encrypt_flag) and b) requires tool to support -e/d flag, I don't have a good alternative other than an encrypt AND decrypt template option
         cmd.append(arg)
     try:
         result = subprocess.call(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -44,11 +46,13 @@ def verify_test(test_vector, payload_dir, cli_path, cmd_template):
     passphrase = test_vector.get('passphrase', '')
     payload_file = test_vector.get('payload_file', '')
     expected_canon = test_vector.get('expected_canon', '')
+    encrypt = test_vector.get('encrypt', False)
+    salt = test_vector.get('salt', '')
     payload_path = os.path.join(payload_dir, payload_file)
     output_path = payload_path + '.dec'
     if not os.path.exists(payload_path):
         return False, comment + ' [missing payload]'
-    result = run_decrypt(cli_path, payload_path, passphrase, output_path, cmd_template)
+    result = run_decrypt(cli_path, payload_path, passphrase, output_path, cmd_template, salt=salt, encrypt=encrypt)
     passed = False
     if expect == 'success':
         if result == 0:
@@ -78,13 +82,14 @@ def main():
     if len(sys.argv) < 3:
         print("Usage: python testharness.py <cli_path> <test_vectors_dir> [cmd_template]")
         print("  cmd_template: e.g. '{CLI} -d --password {PASSPHRASE} {IN} {OUT}'")
+        print("  template vars: {CLI} {IN} {OUT} {PASSPHRASE} {SALT}")
         sys.exit(1)
     cli_path = sys.argv[1]
     test_vectors_dir = sys.argv[2]
     if len(sys.argv) >= 4:
         cmd_template = sys.argv[3].split()
     else:
-        cmd_template = [cli_path, '-d', '-o', '{OUT}', '-p', '{PASSPHRASE}', '{IN}']
+        cmd_template = [cli_path, '{ENCRYPT}', '-o', '{OUT}', '-p', '{PASSPHRASE}', '{IN}']
     passed = 0
     failed = 0
     for filename in sorted(os.listdir(test_vectors_dir)):
