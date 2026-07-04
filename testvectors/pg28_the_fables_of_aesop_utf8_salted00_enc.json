@@ -1,0 +1,9 @@
+{
+    "comment": "Encryption with static salt",
+    "encrypt": true,
+    "passphrase": "password",
+    "salt": "0000000000000000",
+    "expect": "success",
+    "expected_canon": "pg28_the_fables_of_aesop_utf8_salted00.chi",
+    "payload_file": "pg28_the_fables_of_aesop_utf8.plaintext"
+}

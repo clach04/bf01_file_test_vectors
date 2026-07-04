@@ -1,0 +1,7 @@
+{
+    "comment": "Decryption sanity check with static salt",
+    "passphrase": "password",
+    "expect": "success",
+    "payload_file": "pg28_the_fables_of_aesop_utf8_salted00.chi",
+    "expected_canon": "pg28_the_fables_of_aesop_utf8.plaintext"
+}
