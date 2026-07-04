@@ -1,0 +1,7 @@
+{
+    "comment": "ptcipher generated payload",
+    "passphrase": "password",
+    "expect": "success",
+    "payload_file": "aesop_ptcipher.chi",
+    "expected_canon": "aesop.plaintext"
+}

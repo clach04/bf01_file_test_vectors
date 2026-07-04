@@ -27,6 +27,12 @@ Some extracted from https://github.com/clach04/puren_tonbo/tree/main/puren_tonbo
       * password is `password`
       * Approx 1.5Kb.
 
+  * aesop_ptcipher.chi -  Tombo Blowfish encrypted from `aesop.plaintext`, essentially the same as aesop.chi
+    Created with ptcipher
+      * password is `password`
+      * Approx 1.5Kb.
+      * `ptcipher -e --password  password --cipher=chi -o aesop_ptcipher.chi aesop.plaintext`
+
   * pg28_the_fables_of_aesop_utf8.plaintext - plain text file, utf-8 multi byte encoding
       * Approx 100Kb.
       * utf-8 encoding
