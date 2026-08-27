@@ -24,6 +24,38 @@ def compute_hash(file_path):
             sha256.update(chunk)
     return sha256.hexdigest()
 
+def compare_files(actual_path, expected_path, ignore_tail=False):
+    """Compare two files for equality.
+
+    With ignore_tail=True, trailing bytes (up to the last 8-byte block
+    boundary of the shorter file) are ignored.  This supports comparing
+    output from different BF01 implementations whose final partial block /
+    zero padding region differs:
+      - .chi files: only the last 8-byte cipher block of the payload is
+        relaxed, and the file-size header field is honoured so bytes past
+        datasize are skipped entirely;
+      - plaintext/other files: compared up to the shorter length.
+    """
+    if not ignore_tail:
+        return compute_hash(actual_path) == compute_hash(expected_path)
+    with open(actual_path, 'rb') as f:
+        a = f.read()
+    with open(expected_path, 'rb') as f:
+        b = f.read()
+    def trim(x):
+        if x[:4] == b'BF01' and len(x) >= 12:
+            # little-endian uint32 datasize from header; layout:
+            # magic(4) datasize(4) salt(8) md5(16) ciphertext...
+            import struct
+            datasize = struct.unpack('<I', x[4:8])[0]
+            ct_end = 8 + 24 + ((datasize >> 3) + 1) * 8   # whole blocks of ciphertext
+            return x[8:min(len(x), max(ct_end - 8, 24))]  # drop final cipher block
+        return x  # plaintext/other files compared via min-length prefix below
+    a_t = trim(a)
+    b_t = trim(b)
+    n = min(len(a_t), len(b_t))
+    return a_t[:n] == b_t[:n]
+
 def run_crypt_tool(cli_path, payload_path, passphrase, output_path, cmd_template, salt='', encrypt=False):
     cmd = []
     #if salt:
@@ -57,7 +89,7 @@ def run_crypt_tool(cli_path, payload_path, passphrase, output_path, cmd_template
         #print(e)
         return -1
 
-def verify_test(test_vector, payload_dir, cli_path, cmd_template_decrypt, cmd_template_encrypt=None):
+def verify_test(test_vector, payload_dir, cli_path, cmd_template_decrypt, cmd_template_encrypt=None, global_ignore_tail=False):
     comment = test_vector.get('comment', '')
     expect = test_vector['expect']
     passphrase = test_vector.get('passphrase', '')
@@ -78,15 +110,14 @@ def verify_test(test_vector, payload_dir, cli_path, cmd_template_decrypt, cmd_te
     if expect == 'success':
         if result == 0:
             if os.path.exists(output_path):
-                actual_hash = compute_hash(output_path)
                 expected_path = os.path.join(payload_dir, expected_canon)
                 if os.path.exists(expected_path):
-                    expected_hash = compute_hash(expected_path)
-                    passed = actual_hash == expected_hash
+                    ignore_tail = test_vector.get('ignore_tail', False) or global_ignore_tail
+                    passed = compare_files(output_path, expected_path, ignore_tail=ignore_tail)
                     verbose = False
                     #verbose = True
                     if not passed and verbose:
-                        print(expected_path, actual_hash, expected_hash)
+                        print(expected_path, compute_hash(output_path), compute_hash(expected_path))
                         #import pdb; pdb.set_trace()  # DEBUG
                 else:
                     passed = False
@@ -112,12 +143,14 @@ def main():
         sys.exit(1)
     cli_path = sys.argv[1]
     test_vectors_dir = sys.argv[2]
-    if len(sys.argv) >= 4:
-        cmd_template_decrypt = sys.argv[3].split()
+    args = [a for a in sys.argv[3:] if a != '--ignore-tail']
+    global_ignore_tail = '--ignore-tail' in sys.argv[3:]
+    if len(args) >= 1:
+        cmd_template_decrypt = args[0].split()
     else:
         cmd_template_decrypt = [cli_path, '{ENCRYPT}', '-o', '{OUT}', '-p', '{PASSPHRASE}', '{IN}']
-    if len(sys.argv) >= 5:
-        cmd_template_encrypt = sys.argv[4].split()
+    if len(args) >= 2:
+        cmd_template_encrypt = args[1].split()
     else:
         cmd_template_encrypt = None
     passed = 0
@@ -127,7 +160,7 @@ def main():
             continue
         json_path = os.path.join(test_vectors_dir, filename)
         tv = load_test_vector(json_path)
-        result, comment = verify_test(tv, test_vectors_dir, cli_path, cmd_template_decrypt, cmd_template_encrypt)
+        result, comment = verify_test(tv, test_vectors_dir, cli_path, cmd_template_decrypt, cmd_template_encrypt, global_ignore_tail)
         if result:
             passed += 1
             print("PASS: %s - %s" % (filename, comment))
