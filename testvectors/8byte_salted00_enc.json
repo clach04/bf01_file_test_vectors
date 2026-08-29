@@ -1,0 +1,9 @@
+{
+    "comment": "Encryption with static salt, 8byte plaintext",
+    "encrypt": true,
+    "passphrase": "password",
+    "salt": "0000000000000000",
+    "expect": "success",
+    "expected_canon": "8byte_salted00.chi",
+    "payload_file": "8byte_salted00.plaintext"
+}

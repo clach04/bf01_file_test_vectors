@@ -1,0 +1,7 @@
+{
+    "comment": "Decryption sanity check with static salt, 1byte plaintext",
+    "passphrase": "password",
+    "expect": "success",
+    "payload_file": "1byte_salted00.chi",
+    "expected_canon": "1byte_salted00.plaintext"
+}

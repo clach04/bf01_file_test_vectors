@@ -66,6 +66,27 @@ Some extracted from https://github.com/clach04/puren_tonbo/tree/main/puren_tonbo
           * will load, no BOM issues
           * will save cleanly
 
+  * 0byte_salted00.chi, 1byte_salted00.chi, 7byte_salted00.chi, 8byte_salted00.chi
+      * Edge-case size canon files (empty, 1 byte, 7 bytes partial block,
+        8 bytes exact block) encrypted with `chi_crypt_salted.exe` using
+        salt of all zeros, `--salt 0000000000000000`, password `password`
+      * Plaintexts are `*_salted00.plaintext` (0-byte file is genuinely empty)
+      * Sizes: 0/1/7 byte plaintexts -> 40 byte .chi (salt 8 + md5 16 +
+        one cipher block); 8 byte plaintext -> 48 byte .chi (extra
+        padding-only cipher block, per Tombo BF_Enc semantics)
+      * TODO: expand to a fuller size range (e.g. 2..15, 16, 23, 24, 25,
+        plus a large multiple-of-8)
+      * TODO: add a non-zero salt canon variant (e.g. `0123456789ABCDEF`)
+      * Verified byte-identical encrypt AND decrypt across all three tools:
+        `chi_crypt_salted.exe` (new C), original TomboCrypt
+        `chi_crypt_salted.exe`, and `chi_tool.py`/`chi_io.py`
+      * NOTE: empty-file encryption initially diverged in Python
+        `chi_io.py` - it skipped the padding-only cipher block when
+        plaintext length was 0 (guard `plain_text_len > 0`); original
+        Tombo and the new C tool both emit the block. Fixed 2026-08-29.
+      * Empty plaintext is accepted by all three tools (rc=0), producing
+        a decryptable file whose embedded MD5 is md5(b'')
+
   * pg28_the_fables_of_aesop_utf8_salted00.chi - Tombo Blowfish encrypted from `pg28_the_fables_of_aesop_utf8.plaintext`
       * Similar to pg28_the_fables_of_aesop_utf8.chi, except this was encrypted using `chi_crypt_salted` using salt of all zeros, `--salt 0000000000000000`
       * This should be decryptable by any Tombo compatible tool, BUT not all Tombo compatible tools will be able to generate this exact file, reasons for failure to match:
