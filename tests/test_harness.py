@@ -6,7 +6,7 @@ import unittest
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from testharness import load_test_vector, compute_hash, run_decrypt
+from testharness import load_test_vector, compute_hash, run_crypt_tool
 
 class TestLoadTestVector(unittest.TestCase):
     def test_load_json(self):
@@ -28,17 +28,17 @@ class TestComputeHash(unittest.TestCase):
 class TestCmdTemplate(unittest.TestCase):
     def test_custom_template(self):
         template = ['{CLI}', '-d', '--password', '{PASSPHRASE}', '{IN}', '{OUT}']
-        result = run_decrypt('cli', 'in.bin', 'pass', 'out.bin', template)
+        result = run_crypt_tool('cli', 'in.bin', 'pass', 'out.bin', template)
         self.assertEqual(result, -1)
 
     def test_custom_template_with_salt(self):
         template = ['{CLI}', '-d', '--password', '{PASSPHRASE}', '-s', '{SALT}', '{IN}', '{OUT}']
-        result = run_decrypt('cli', 'in.bin', 'pass', 'out.bin', template, salt='mysalt')
+        result = run_crypt_tool('cli', 'in.bin', 'pass', 'out.bin', template, salt='mysalt')
         self.assertEqual(result, -1)
 
     def test_encrypt_template(self):
         template = ['{CLI}', '{ENCRYPT}', '--password', '{PASSPHRASE}', '{IN}', '{OUT}']
-        result = run_decrypt('cli', 'in.bin', 'pass', 'out.bin', template, encrypt=True)
+        result = run_crypt_tool('cli', 'in.bin', 'pass', 'out.bin', template, encrypt=True)
         self.assertEqual(result, -1)
 
 if __name__ == '__main__':
